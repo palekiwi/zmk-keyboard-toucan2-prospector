@@ -1,109 +1,186 @@
+/*
+ * Personal keymap: port of the Piantor Pro QMK Miryoku-style layout
+ * (36 effective keys, Colemak-DH base, 12 layers) to the Toucan2.
+ *
+ * Source: nix-config home/config/qmk/beekeeb/piantor_pro/miryoku/
+ *
+ * Layer indices are load-bearing: toucan-layout.dtsi maps trackpad
+ * touch to &mo 4, so MOU must stay at index 4. HSH (the only toggled
+ * layer) sits at index 8 and is toggled with &tog HSH.
+ *
+ * Thumb binding order follows the Toucan2 physical layout
+ * (left: outer, center, inner | right: inner, center, outer) and the
+ * Piantor Pro physical positions from its QMK keyboard.json, which
+ * invert the TK_LI/TK_LO/TK_RO/TK_RI macro names in the source
+ * keymap: Esc/PCT is the left OUTER thumb, Tab/MOU the left INNER,
+ * Ent/SYM the right INNER, Del/FUN the right OUTER.
+ */
+
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
-#include <dt-bindings/zmk/bt.h>
-#include <dt-bindings/zmk/outputs.h>
 #include <dt-bindings/zmk/pointing.h>
 
 #define BASE 0
 #define NAV  1
-#define SYM  2
-#define ADJ  3
+#define NUM  2
+#define PCT  3
+#define MOU  4
+#define SYM  5
+#define FUN  6
+#define LHN  7
+#define HSH  8
+#define RHN  9
+#define MED  10
+#define APP  11
 
 / {
     behaviors {
+        /*
+         * Home row mods. QMK baseline: TAPPING_TERM 175,
+         * PERMISSIVE_HOLD, TAPPING_FORCE_HOLD. require-prior-idle-ms
+         * replaces the process_record_user roll corrections of the
+         * QMK keymap (first-iteration values; tuning deferred).
+         */
         hm: home_row_mods {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
-            tapping-term-ms = <200>;
+            tapping-term-ms = <175>;
             quick-tap-ms = <0>;
-            flavor = "tap-preferred";
+            flavor = "balanced";
             require-prior-idle-ms = <125>;
             bindings = <&kp>, <&kp>;
         };
-
-        td_shift_caps: tap_dance_shift_caps {
-            compatible = "zmk,behavior-tap-dance";
-            #binding-cells = <0>;
-            tapping-term-ms = <200>;
-            bindings = <&kp LSHIFT>, <&caps_word>;
-        };
-
-        // Bound to the backspace key on every layer that has one.
-        bs_del: backspace_delete {
-            compatible = "zmk,behavior-mod-morph";
-            #binding-cells = <0>;
-            bindings = <&kp BSPC>, <&kp DEL>;
-            mods = <(MOD_LSFT|MOD_RSFT)>; // Shift + Backspace = Delete
-        };
     };
 
-    conditional_layers {
-        compatible = "zmk,conditional-layers";
-        tri_layer {
-            if-layers = <1 2>;
-            then-layer = <3>;
-        };
+    /* Same timing baseline for the built-in layer-tap (&lt). */
+    &lt {
+        tapping-term-ms = <175>;
+        quick-tap-ms = <0>;
+        flavor = "tap-preferred";
+        require-prior-idle-ms = <125>;
     };
 
     keymap {
         compatible = "zmk,keymap";
 
         base {
-            display-name = "BASE";
+            display-name = "COLEMAK";
             bindings = <
-                &kp TAB        &kp Q      &kp W      &kp E        &kp R         &kp T   &kp Y &kp U         &kp I        &kp O       &kp P         &bs_del
-                &kp ESC        &hm LGUI A &hm LALT S &hm LCTRL D  &hm LSHIFT F  &kp G   &kp H &hm RSHIFT J  &hm RCTRL K  &hm RALT L  &hm RGUI SEMI &kp SQT
-                &td_shift_caps &kp Z      &kp X      &kp C        &kp V         &kp B   &kp N &kp M         &kp COMMA    &kp DOT     &kp FSLH      &kp RCTRL
-                                                     &kp LGUI     &mo 1         &kp SPACE   &kp RET &mo 2 &kp RALT
+                &none    &kp Q           &kp W    &lt PCT F        &lt MED P         &kp B             &kp J    &lt APP L         &lt SYM U         &kp Y      &kp PAUS         &none
+                &none    &hm LSHIFT A    &hm LALT R    &hm LCTRL S      &hm LGUI T         &kp G             &kp M    &hm RGUI N        &hm RCTRL E       &hm RALT I    &hm RSHIFT O     &none
+                &none    &lt LHN Z       &kp X    &kp C            &hm LSHIFT D       &kp V             &kp K    &hm RSHIFT H      &kp COMMA         &kp DOT    &lt RHN FSLH     &none
+                                                  &lt PCT ESC       &lt NAV SPACE      &lt MOU TAB       &lt SYM RET   &lt NUM BSPC   &lt FUN DEL
             >;
         };
 
         nav {
             display-name = "NAV";
             bindings = <
-                &kp TAB     &kp N1          &kp N2       &kp N3       &kp N4       &kp N5         &kp N6   &kp N7   &kp N8 &kp N9    &kp N0 &bs_del
-                &bt BT_CLR  &bt BT_SEL 0    &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4   &kp LEFT &kp DOWN &kp UP &kp RIGHT &trans &trans
-                &kp LSHFT   &studio_unlock  &trans       &trans       &trans       &trans         &trans   &trans   &trans &trans    &trans &trans
-                                                &kp LGUI     &trans       &kp SPACE      &kp RET  &trans   &kp RALT
+                &none    &none           &none         &none            &none              &none             &kp K_APP    &kp GRAVE    &kp SQT      &kp DQT    &none            &none
+                &none    &kp LSHIFT      &kp LALT      &kp LCTRL        &kp LGUI           &none             &kp K_APP    &kp LEFT     &kp DOWN     &kp UP     &kp RIGHT        &none
+                &none    &none           &none         &none            &kp LALT           &none             &kp INS      &kp HOME     &kp PGDN     &kp PGUP   &kp END          &none
+                                                  &trans            &trans             &trans             &trans       &trans       &trans
+            >;
+        };
+
+        num {
+            display-name = "NUM";
+            bindings = <
+                &none    &kp LBKT        &kp N7        &kp N8           &kp N9             &kp RBKT          &none        &none        &none        &none      &none            &none
+                &none    &kp COLN        &kp N1        &kp N2           &kp N3             &kp PLUS          &none        &kp RGUI     &kp RCTRL    &kp RALT   &kp RSHIFT       &none
+                &none    &kp DOT         &kp N4        &kp N5           &kp N6             &kp EQUAL         &none        &kp RALT     &none        &none      &none            &none
+                                                  &kp MINUS         &kp N0             &kp DOT            &trans       &trans       &trans
+            >;
+        };
+
+        pct {
+            display-name = "PCT";
+            bindings = <
+                &none    &none           &none         &none            &none              &none             &none        &none        &kp LBKT     &kp RBKT   &tog HSH         &none
+                &none    &kp LSHIFT      &kp LALT      &kp LCTRL        &kp LGUI           &none             &none        &kp LPAR     &kp LBRC     &kp RBRC   &kp RPAR         &none
+                &none    &none           &none         &none            &kp LALT           &none             &none        &kp HASH     &kp CARET    &kp DLLR   &kp BSLH         &none
+                                                  &kp F20           &kp C_PP           &kp C_MUTE         &trans       &trans       &trans
+            >;
+        };
+
+        mou {
+            display-name = "MOU";
+            bindings = <
+                &none    &none           &none         &none            &none              &none             &kp C_AC_REDO    &kp C_AC_PASTE    &kp C_AC_COPY    &kp C_AC_CUT     &kp C_AC_UNDO    &none
+                &none    &kp LSHIFT      &kp LALT      &kp LCTRL        &kp LGUI           &none             &none            &mk MOVE_LEFT     &mk MOVE_DOWN    &mk MOVE_UP      &mk MOVE_RIGHT   &none
+                &none    &none           &none         &none            &kp LALT           &none             &none            &mk SCRL_LEFT     &mk SCRL_DOWN    &mk SCRL_UP      &mk SCRL_RIGHT   &none
+                                                  &trans            &trans             &trans             &mkp RCLK        &mkp LCLK         &mkp MCLK
             >;
         };
 
         sym {
             display-name = "SYM";
             bindings = <
-                &kp TAB   &kp EXCL &kp AT &kp HASH &kp DLLR &kp PRCNT   &kp CARET &kp AMPS  &kp KP_MULTIPLY &kp LPAR &kp RPAR &bs_del
-                &kp LCTRL &trans   &trans &trans   &trans   &trans      &kp MINUS &kp EQUAL &kp LBKT        &kp RBKT &kp BSLH &kp GRAVE
-                &kp LSHFT &trans   &trans &trans   &trans   &trans      &kp UNDER &kp PLUS  &kp LBRC        &kp RBRC &kp PIPE &kp TILDE
-                                          &kp LGUI &trans   &kp SPACE   &kp RET   &trans    &kp RALT
+                &none    &kp CAPS        &kp AMPS      &kp AT           &kp PIPE           &kp STAR          &none        &none        &none        &none      &none            &none
+                &none    &kp PRCNT       &kp EXCL      &kp COLN         &kp EQUAL          &kp PLUS          &none        &kp RGUI     &kp RCTRL    &kp RALT   &kp RSHIFT       &none
+                &none    &kp TILDE       &kp HASH      &kp BSLH         &kp SEMI           &kp EQUAL         &none        &kp RALT     &none        &none      &none            &none
+                                                  &kp MINUS         &kp UNDER          &kp HASH           &trans       &trans       &trans
             >;
         };
 
-        adj {
-            display-name = "ADJ";
+        fun {
+            display-name = "FUN";
             bindings = <
-                &kp TAB   &trans &kp F7 &kp F8 &kp F9 &kp F12   &kp C_VOL_DN &kp C_MUTE  &kp C_VOL_UP &trans &trans &bs_del
-                &kp LCTRL &trans &kp F4 &kp F5 &kp F6 &kp F11   &trans       &trans      &trans       &trans &trans &trans
-                &kp LSHFT &trans &kp F1 &kp F2 &kp F3 &kp F10   &trans       &trans      &trans       &trans &trans &trans
-                                   &kp LGUI &mo NAV &kp SPACE   &kp RET &mo 2 &kp RALT
+                &none    &kp F13         &kp F7        &kp F8           &kp F9             &kp F16           &none        &none        &none        &none      &none            &none
+                &none    &kp F14         &kp F1        &kp F2           &kp F3             &kp F17           &none        &kp RGUI     &kp RCTRL    &kp RALT   &kp RSHIFT       &none
+                &none    &kp F15         &kp F4        &kp F5           &kp F6             &kp F18           &none        &kp RALT     &none        &none      &none            &none
+                                                  &kp F12           &kp F11            &kp F10            &trans       &trans       &trans
             >;
         };
 
-        mouse {
-            display-name = "MOU";
+        lhn {
+            display-name = "LHN";
             bindings = <
-                &trans &trans &trans &trans &trans &trans           &trans &trans &trans &trans &trans &trans
-                &trans &trans &trans &trans &trans &trans           &trans &trans &trans &trans &trans &trans
-                &trans &trans &trans &trans &trans &trans           &trans &trans &trans &trans &trans &trans
-                            &mkp MCLK &mkp LCLK &mkp RCLK           &mkp LCLK &mkp RCLK &mkp MCLK
+                &none    &none           &kp HOME      &kp UP           &kp END            &none             &none        &none        &none        &none      &none            &none
+                &none    &none           &kp LEFT      &kp DOWN         &kp RIGHT          &none             &none        &none        &none        &none      &none            &none
+                &none    &none           &none         &none            &none              &none             &none        &none        &none        &none      &none            &none
+                                                  &kp RET            &kp BSPC           &kp DEL            &trans       &trans       &trans
             >;
         };
 
-        extra_2 {
-                status = "reserved";
+        hsh {
+            display-name = "HSH";
+            bindings = <
+                &none    &kp SQT         &kp GT        &kp CARET        &kp PLUS           &kp RBRC          &kp LS(H)    &kp N4      &kp AT        &kp LS(Q)  &tog HSH         &none
+                &none    &kp GRAVE       &kp PRCNT     &kp DQT          &kp TILDE          &kp COMMA         &kp BSLH     &kp SEMI    &kp UNDER    &kp HASH  &kp LS(J)        &none
+                &none    &kp STAR        &kp QMARK     &kp N8           &kp LBRC           &kp FSLH          &kp EQUAL    &kp N7      &kp LBKT     &kp LPAR  &kp COLN         &none
+                                                  &none              &kp AMPS           &none              &none        &none       &none
+            >;
         };
 
-        extra_3 {
-                status = "reserved";
+        rhn {
+            display-name = "RHN";
+            bindings = <
+                &none    &kp HOME        &kp UP        &kp END          &kp PGUP           &none             &none        &kp HOME    &kp UP       &kp END    &none            &none
+                &none    &none           &none         &none            &none              &none             &none        &kp LEFT    &kp DOWN     &kp RIGHT  &none            &none
+                &none    &none           &none         &none            &none              &none             &none        &none       &none        &none      &none            &none
+                                                  &trans             &trans             &trans             &kp ESC       &kp SPACE   &kp TAB
+            >;
+        };
+
+        med {
+            display-name = "MED";
+            bindings = <
+                &none    &none           &none         &none            &none              &none             &none        &kp C_AC_BACK    &kp C_BRI_DN     &kp C_BRI_UP     &kp C_AC_FORWARD    &none
+                &none    &kp LSHIFT      &kp LALT      &kp LCTRL        &kp LGUI           &none             &none        &kp C_PREV       &kp C_VOL_DN     &kp C_VOL_UP     &kp C_NEXT          &none
+                &none    &none           &none         &none            &kp LALT           &none             &none        &none            &none            &none            &none               &none
+                                                  &kp F12            &kp PSCRN          &kp F19            &kp C_MUTE      &kp C_PP         &kp F20
+            >;
+        };
+
+        app {
+            display-name = "APP";
+            bindings = <
+                &none    &kp C_AC_BACK       &kp C_BRI_DN    &kp C_BRI_UP      &kp C_AC_FORWARD      &kp PSCRN          &none            &none            &none            &studio_unlock    &bootloader      &none
+                &none    &kp C_AC_BOOKMARKS  &kp C_AL_CALC    &kp C_AC_HOME     &kp C_AC_SEARCH       &kp C_AL_MY_COMPUTER   &none        &kp RGUI         &kp RCTRL        &kp RALT          &kp RSHIFT       &none
+                &none    &none               &none           &none             &none                 &none              &none            &kp RALT         &none            &none            &none            &none
+                                                  &trans                &trans               &trans               &trans           &trans           &trans
+            >;
         };
     };
 };
