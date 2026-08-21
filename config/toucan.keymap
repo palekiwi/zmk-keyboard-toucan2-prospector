@@ -54,14 +54,6 @@
         };
     };
 
-    /* Same timing baseline for the built-in layer-tap (&lt). */
-    &lt {
-        tapping-term-ms = <175>;
-        quick-tap-ms = <0>;
-        flavor = "tap-preferred";
-        require-prior-idle-ms = <125>;
-    };
-
     keymap {
         compatible = "zmk,keymap";
 
@@ -185,4 +177,14 @@
             >;
         };
     };
+};
+
+/* Same timing baseline for the built-in layer-tap. &label amend blocks
+ * are only valid at the top level of a devicetree, outside any node.
+ */
+&lt {
+    tapping-term-ms = <175>;
+    quick-tap-ms = <0>;
+    flavor = "tap-preferred";
+    require-prior-idle-ms = <125>;
 };
