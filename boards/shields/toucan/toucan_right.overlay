@@ -66,7 +66,7 @@
         filter-settings=<0x0B>;
         hold-time = <500>;
 
-        zoom;
+        // zoom; // disabled: pinch was misclassified at scroll-start, firing Ctrl+=/- chords via zip_zoom_mapper (UI zoom / stray '=' in terminals). Re-enable + retune zoom-initial-distance if pinch is ever wanted again.
         scroll;
         two-finger-tap;
         single-tap;
