@@ -29,5 +29,20 @@ include:
   - board: seeeduino_xiao_ble
     shield: toucan_right rgbled_adapter
     cmake-args: -DCONFIG_ZMK_SLEEP=y -DCONFIG_ZMK_PM_SOFT_OFF=y
+  # Standalone (dongle-less) mode: left half becomes the BLE central and
+  # pairs directly with the host. Same shields and keymap as above; role and
+  # pointing are overridden via Kconfig. The right half needs no separate
+  # build - a peripheral is role-agnostic, so the toucan_right artifact
+  # above is flashed unchanged.
+  - board: seeeduino_xiao_ble
+    shield: toucan_left rgbled_adapter toucan_pet
+    cmake-args: >-
+      -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y
+      -DCONFIG_ZMK_POINTING=y
+      -DCONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING=y
+      -DCONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_PROXY=y
+      -DCONFIG_ZMK_SLEEP=y
+      -DCONFIG_ZMK_PM_SOFT_OFF=y
+    artifact-name: toucan_left_standalone
   - board: seeeduino_xiao_ble
     shield: settings_reset
